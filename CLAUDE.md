@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A hands-on Git workshop with 6 challenges (0–5) designed for engineering teams. Each challenge teaches a practical history-rewriting technique. There is no build system, no tests, and no application code — the repo contains only challenge materials.
+A hands-on VCS workshop with 6 challenges (0–5) designed for engineering teams. Each challenge teaches a practical history-rewriting technique. There is no build system, no tests, and no application code — the repo contains only challenge materials.
 
 ## Structure
 

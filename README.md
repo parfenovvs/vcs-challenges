@@ -1,4 +1,4 @@
-# Git Workshop
+# VCS Workshop
 
 Hands-on challenges for practising Git history rewriting. Each challenge drops you into a realistic scenario and asks you to clean it up.
 
