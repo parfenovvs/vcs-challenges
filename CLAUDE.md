@@ -9,7 +9,7 @@ A hands-on VCS workshop with 6 challenges (0–5) designed for engineering teams
 ## Structure
 
 Each `challenge-N/` directory contains:
-- `CHALLENGE.md` — scenario description, starting state, goal, and expected end state
+- `README.md` — scenario description, starting state, goal, and expected end state
 - `setup.sh` — idempotent script that creates a fresh workspace + bare remote under `~/git-workshop-challenges/challenge-N/`
 - `solutions/` — step-by-step solution guides (Git and jj variants)
 
