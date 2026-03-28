@@ -47,16 +47,16 @@ git -C "$WORKSPACE" push -u origin release/1.0
 # Back to main for commits 4 and 5
 git -C "$WORKSPACE" checkout main
 
-# Commit 4: the hotfix
-printf 'calculate(n - 1)  # fix off-by-one\n' >> "$WORKSPACE/app.txt"
-git -C "$WORKSPACE" add app.txt
+# Commit 4: the hotfix (separate file so cherry-pick is conflict-free)
+printf 'calculate(n - 1)  # fix off-by-one\n' > "$WORKSPACE/calculate.py"
+git -C "$WORKSPACE" add calculate.py
 git -C "$WORKSPACE" \
   -c user.name="Workshop" -c user.email="workshop@example.com" \
   commit -m "fix: correct off-by-one in calculate()"
 
-# Commit 5: unrelated feature
-printf 'export(data)\n' >> "$WORKSPACE/app.txt"
-git -C "$WORKSPACE" add app.txt
+# Commit 5: unrelated feature (separate file so cherry-pick is conflict-free)
+printf 'export(data)\n' > "$WORKSPACE/export.py"
+git -C "$WORKSPACE" add export.py
 git -C "$WORKSPACE" \
   -c user.name="Workshop" -c user.email="workshop@example.com" \
   commit -m "feat: add export functionality"
