@@ -29,6 +29,7 @@ Read `CHALLENGE.md` in this repo for the scenario, goal, and expected end state 
 | 3 | The Wrong Cherry-Pick | Undo a bad cherry-pick and apply the correct one |
 | 4 | The Stack Collapse | Rebase a stacked branch after a squash-merge at the base |
 | 5 | The Stack Insertion | Insert a new branch mid-stack and rebase everything above it |
+| 6 | The Parallel Workspaces | Work on three branches simultaneously using worktrees |
 
 ## Solutions
 
