@@ -52,4 +52,4 @@ def display(result):
 MAX_INPUT = 1000  # <-- belongs in calculate(), not here
 ```
 
-`MAX_INPUT` is introduced in commit 1 (`calculate`), removed and reintroduced only in the final file via commit 1. Commit 2 (`display`) diff shows only the `display()` function being added.
+`MAX_INPUT` should be introduced in commit 1 (`calculate`). Commit 2 (`display`) diff should show only the `display()` function being added.

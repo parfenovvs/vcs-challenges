@@ -111,9 +111,6 @@ cat features.txt   # on feat/b tip
 # feature_new()
 # feature_b()
 ```
-
-> **Note on the challenge's expected output**: `CHALLENGE.md` shows `git log main..feat/new` returning only 1 commit. In practice it returns 2 (feature_a + feature_new) because `feat/a` is not yet merged into `main`. The stack structure is correct; the expected output in the challenge description is slightly off.
-
 ## Key Insights
 
 - **Mid-stack insertion = branch + rebase**: The primitive operation is always the same: create the new branch at the insertion point, commit your changes, then `git rebase <new-branch>` on every branch that was above the insertion point.

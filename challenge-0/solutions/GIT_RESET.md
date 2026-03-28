@@ -39,7 +39,7 @@ git add utils.txt
 git commit -m "feat: add MAX_SIZE constant"
 ```
 
-### 5. Create the second commit (function only)
+### 4. Create the second commit (function only)
 
 Add the function on top and commit:
 
@@ -55,7 +55,7 @@ git add utils.txt
 git commit -m "feat: add foo function"
 ```
 
-### 6. Force-push the rewritten branch
+### 5. Force-push the rewritten branch
 
 ```bash
 git push --force-with-lease origin feat/split
@@ -64,7 +64,7 @@ git push --force-with-lease origin feat/split
 **Why `--force-with-lease` instead of `--force`?**
 The original commit is already pushed. Since we rewrote history, a normal push is rejected. `--force-with-lease` does the force push but adds a safety check: it refuses if the remote has new commits you haven't seen locally. This prevents accidentally overwriting a teammate's work.
 
-### 7. Verify
+### 6. Verify
 
 ```bash
 git log --oneline main..feat/split

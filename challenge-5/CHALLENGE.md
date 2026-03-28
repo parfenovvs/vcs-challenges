@@ -50,6 +50,7 @@ Mid-stack insertions are common: a reviewer asks for a prerequisite change, or y
 ```
 git log --oneline main..feat/new
 # <hash> feat: add feature_new
+# <hash> feat: add feature_a
 
 git log --oneline main..feat/b
 # <hash> feat: add feature_b

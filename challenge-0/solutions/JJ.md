@@ -81,7 +81,16 @@ The diff of this new change is only the function — exactly what we want.
 jj describe -m "feat: add foo function"
 ```
 
-### 6. Verify the stack
+### 6. Update the bookmark and push
+
+The `feat/split` bookmark still points to the old combined commit. Move it to `@`:
+
+```bash
+jj bookmark set feat/split
+jj git push --bookmark feat/split
+```
+
+### 7. Verify the stack
 
 ```bash
 jj log -r "main..feat/split"
@@ -90,17 +99,8 @@ jj log -r "main..feat/split"
 Expected output (two commits above main, correct order):
 
 ```
-@  qqrxnmnn  feat/split  feat: add foo function
-○  psyvznpp              feat: add MAX_SIZE constant
-```
-
-### 7. Update the bookmark and push
-
-The `feat/split` bookmark still points to the old combined commit. Move it to `@`:
-
-```bash
-jj bookmark set feat/split
-jj git push --bookmark feat/split
+@  <new-id>  feat/split  feat: add foo function
+○  <old-id>              feat: add MAX_SIZE constant
 ```
 
 jj will force-move the remote bookmark (the history was rewritten).

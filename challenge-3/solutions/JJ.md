@@ -50,9 +50,10 @@ because it pointed solely to the abandoned commit.
 jj duplicate -r ywvqzkqn
 ```
 
-`jj duplicate` creates an independent copy of the change. Because the current `@`
-parent is already the branch point, the duplicate lands in exactly the right place —
-on top of `feat: add authentication`.
+`jj duplicate` creates an independent copy of the change, preserving its original
+parent. Because the fix commit on `main` already has `feat: add authentication` as
+its parent — the same commit that `release/1.0` branched from — the duplicate lands
+in exactly the right place, on top of the branch point.
 
 The output shows the new change ID, e.g. `pkvluspr`.
 
