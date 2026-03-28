@@ -23,13 +23,13 @@ Read `CHALLENGE.md` in this repo for the scenario, goal, and expected end state 
 
 | # | Name | Scenario |
 |---|------|----------|
-| 0 | The Split Commit | Split a bundled commit into two focused ones |
-| 1 | The Simple Fixup | Move a misplaced change into the correct earlier commit |
-| 2 | The Hotfix Cherry-Pick | Backport a bug fix to a release branch |
-| 3 | The Wrong Cherry-Pick | Undo a bad cherry-pick and apply the correct one |
-| 4 | The Stack Collapse | Rebase a stacked branch after a squash-merge at the base |
-| 5 | The Stack Insertion | Insert a new branch mid-stack and rebase everything above it |
-| 6 | The Parallel Workspaces | Work on three branches simultaneously using worktrees |
+| 0 | [The Split Commit](challenge-0/) | Split a bundled commit into two focused ones |
+| 1 | [The Simple Fixup](challenge-1/) | Move a misplaced change into the correct earlier commit |
+| 2 | [The Hotfix Cherry-Pick](challenge-2/) | Backport a bug fix to a release branch |
+| 3 | [The Wrong Cherry-Pick](challenge-3/) | Undo a bad cherry-pick and apply the correct one |
+| 4 | [The Stack Collapse](challenge-4/) | Rebase a stacked branch after a squash-merge at the base |
+| 5 | [The Stack Insertion](challenge-5/) | Insert a new branch mid-stack and rebase everything above it |
+| 6 | [The Parallel Workspaces](challenge-6/) | Work on three branches simultaneously using worktrees |
 
 ## Solutions
 
