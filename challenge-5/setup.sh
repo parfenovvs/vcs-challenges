@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-CHALLENGE_DIR="$HOME/git-workshop-challenges/challenge-4"
+CHALLENGE_DIR="$HOME/git-workshop-challenges/challenge-5"
 WORKSPACE="$CHALLENGE_DIR/workspace"
 REMOTE="$CHALLENGE_DIR/remote.git"
 
@@ -42,40 +42,26 @@ git -C "$WORKSPACE" \
   commit -m "feat: add feature_b"
 git -C "$WORKSPACE" push -u origin feat/b
 
-# feat/c: stacked on feat/b
-git -C "$WORKSPACE" checkout -b feat/c
-printf 'feature_c()\n' >> "$WORKSPACE/features.txt"
-git -C "$WORKSPACE" add features.txt
-git -C "$WORKSPACE" \
-  -c user.name="Workshop" -c user.email="workshop@example.com" \
-  commit -m "feat: add feature_c"
-git -C "$WORKSPACE" push -u origin feat/c
-
-# Simulate squash-merge of feat/a into main
-git -C "$WORKSPACE" checkout main
-git -C "$WORKSPACE" merge --squash feat/a
-git -C "$WORKSPACE" \
-  -c user.name="Workshop" -c user.email="workshop@example.com" \
-  commit -m "feat: add feature_a (#1)"
-git -C "$WORKSPACE" push origin main
-
-# End on feat/b
-git -C "$WORKSPACE" checkout feat/b
+# End on feat/a
+git -C "$WORKSPACE" checkout feat/a
 
 echo ""
 echo "============================================================"
-echo "  CHALLENGE 4 — The Stack Collapse"
+echo "  CHALLENGE 5 — The Stack Insertion"
 echo "============================================================"
 echo ""
-echo "  You are on branch: feat/b"
-echo "  Stack: main <- feat/a <- feat/b <- feat/c"
+echo "  You are on branch: feat/a"
+echo "  Stack: main <- feat/a <- feat/b"
 echo ""
-echo "  feat/a was squash-merged into main as:"
-echo "  'feat: add feature_a (#1)'"
+echo "  You need to insert a NEW branch 'feat/new' between"
+echo "  feat/a and feat/b, adding 'feature_new()' to"
+echo "  features.txt."
 echo ""
-echo "  Now feat/b and feat/c are based on the OLD feat/a"
-echo "  commit, not the new squash commit on main."
-echo "  They need to be rebased onto the updated main."
+echo "  After insertion:"
+echo "  main <- feat/a <- feat/new <- feat/b"
+echo ""
+echo "  feat/b must be rebased so its commit applies cleanly"
+echo "  on top of feat/new."
 echo ""
 echo "  See CHALLENGE.md for full instructions and hints."
 echo "============================================================"

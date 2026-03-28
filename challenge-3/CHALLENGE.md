@@ -1,113 +1,54 @@
-# Challenge 3 — The Stack Collapse
+# Challenge 3 — The Wrong Cherry-Pick
+
+## Scenario
+
+A colleague tried to backport the hotfix to `release/1.0` but cherry-picked the wrong commit — they grabbed the new export feature instead of the bug fix. You've inherited this branch and need to clean it up: remove the unwanted commit and apply the correct one.
 
 ## Starting State
 
-- Branch: `feat/b`
-- Stack before the squash-merge:
+- Branch: `release/1.0`
+- The wrong commit `feat: add export functionality` was already cherry-picked onto it
 
+`main` history:
 ```
-main:   [initial]
-feat/a: [initial] <- feat: add feature_a
-feat/b: [initial] <- feat: add feature_a <- feat: add feature_b
-feat/c: [initial] <- feat: add feature_a <- feat: add feature_b <- feat: add feature_c
+feat: add export functionality       <-- HEAD of main
+fix: correct off-by-one in calculate()
+feat: add authentication             <-- where release/1.0 branched
+feat: add user model
+chore: initial project setup
 ```
 
-- `feat/a` was squash-merged into `main` as a single commit:
-  ```
-  feat: add feature_a (#1)
-  ```
-
-- Current state of `main`:
-  ```
-  feat: add feature_a (#1)    <-- HEAD of main (squash commit)
-  chore: initial project setup
-  ```
-
-- `feat/b` and `feat/c` still point to the **old** `feat/a` commit, which no longer exists in `main`'s ancestry.
+`release/1.0` history (current — broken):
+```
+feat: add export functionality       <-- wrong commit, must be removed
+feat: add authentication
+feat: add user model
+chore: initial project setup
+```
 
 ## Goal
 
-Rebase `feat/b` onto the updated `main`, dropping the now-redundant `feat/a` commit that was already merged. Then do the same for `feat/c` (rebased onto the updated `feat/b`).
+End up with `release/1.0` containing exactly the hotfix and nothing else from after the branch point:
 
-After the challenge:
-- `feat/b` should be 1 commit ahead of `main` (only `feat: add feature_b`)
-- `feat/c` should be 1 commit ahead of `feat/b` (only `feat: add feature_c`)
+```
+fix: correct off-by-one in calculate()   <-- correct commit
+feat: add authentication
+feat: add user model
+chore: initial project setup
+```
 
 ## Why This Matters
 
-This is the everyday cost of stacked PRs with squash-merge. Every time a PR at the base of your stack merges, you must rebase the rest of the stack. Without tooling, this requires careful `--onto` rebasing. This friction is exactly what tools like Graphite and `jj` are designed to eliminate.
-
-## Hints
-
-<details>
-<summary>Hint 1 — Why a plain rebase won't work</summary>
-
-```bash
-git rebase main   # on feat/b — this will likely conflict or duplicate commits
-```
-
-A plain `git rebase main` replays *all* commits in `feat/b` not in `main` — including the `feat: add feature_a` commit, which conflicts with the squash commit already in `main`. You need to tell git to only replay the commits you actually want.
-</details>
-
-<details>
-<summary>Hint 2 — The --onto flag</summary>
-
-`git rebase --onto <newbase> <upstream> <branch>` replays commits from `<upstream>..HEAD` onto `<newbase>`:
-
-```bash
-# Rebase feat/b: take commits from feat/a..feat/b, replay onto main
-git rebase --onto main feat/a feat/b
-```
-
-This says: "everything that was on top of the old `feat/a`, put it on top of `main` instead."
-</details>
-
-<details>
-<summary>Hint 3 — Then update feat/c</summary>
-
-After `feat/b` is rebased, you need to rebase `feat/c` onto the new `feat/b`:
-
-```bash
-# Save the old feat/b position before rebasing feat/b
-# (or use the old feat/b SHA recorded from git log)
-git rebase --onto feat/b <old-feat/b-sha> feat/c
-```
-
-Or simply: after rebasing `feat/b`, check out `feat/c` and rebase it interactively.
-</details>
-
-<details>
-<summary>Hint 4 — Resolving conflicts</summary>
-
-After the squash-merge, `main` contains `feature_a()`. When replaying `feat/b`'s commit on top, git should apply cleanly since `feat/b` only adds `feature_b()`. If you see conflicts, check which version of the file you want and use `git add` + `git rebase --continue`.
-</details>
-
-## Key Commands
-
-```bash
-git log --oneline --graph --all       # visualize the full branch graph
-git rebase --onto <newbase> <upstream> <branch>
-git rebase --continue                 # after resolving conflicts
-git rebase --abort                    # start over
-git push --force-with-lease           # push rewritten branches
-```
+Mistakes happen — especially when commit messages look similar or hashes are copy-pasted in a hurry. Knowing how to undo a cherry-pick with `git reset` and redo it correctly is a practical skill for release branch management on any mobile team.
 
 ## Expected End State
 
 ```
-git log --oneline main..feat/b
-# <hash> feat: add feature_b
-
-git log --oneline main..feat/c
-# <hash> feat: add feature_c
-# <hash> feat: add feature_b
+git log --oneline release/1.0
+# <hash> fix: correct off-by-one in calculate()
+# <hash> feat: add authentication
+# <hash> feat: add user model
+# <hash> chore: initial project setup
 ```
 
-```
-# features.txt at feat/b tip:
-# Features
-feature_a()
-feature_b()
-```
-
-Both `feat/b` and `feat/c` pushed with `--force-with-lease`.
+`main` is unchanged. `release/1.0` has the fix but not the export feature.

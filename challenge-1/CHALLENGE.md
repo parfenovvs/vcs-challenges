@@ -1,5 +1,9 @@
 # Challenge 1 — The Simple Fixup
 
+## Scenario
+
+You're mid-review and a teammate points out that `MAX_INPUT = 1000` landed in the wrong commit — it's a constraint for `calculate()`, but it got bundled into the `display` commit. The PR isn't merged yet, so you can still rewrite history to put each change in the right place.
+
 ## Starting State
 
 - Branch: `feat/fixup`
@@ -26,61 +30,6 @@ The final file content must remain identical. Only the attribution of the `MAX_I
 ## Why This Matters
 
 In code review, a reviewer approving the `display` function shouldn't have to reason about an unrelated constant. Clean commits mean each diff tells a focused story. This is also a common scenario when you're mid-stack and realize a change landed in the wrong commit.
-
-## Hints
-
-<details>
-<summary>Hint 1 — Which tool to reach for</summary>
-
-`git rebase -i` with the `edit` action lets you pause at any commit and amend it. You can also use `fixup` or `squash` to fold a later fix-up commit into an earlier one — but here you need to *move* content from a later commit to an earlier one, so `edit` is cleaner.
-</details>
-
-<details>
-<summary>Hint 2 — Strategy: edit the first commit</summary>
-
-1. Start an interactive rebase back to `main`:
-   ```bash
-   git rebase -i main
-   ```
-2. Mark the first commit (`feat: add calculate function`) as `edit`.
-3. When rebase pauses, amend the commit to add `MAX_INPUT`:
-   ```bash
-   # Edit calculator.txt to add MAX_INPUT = 1000 after calculate()
-   git add calculator.txt
-   git commit --amend --no-edit
-   git rebase --continue
-   ```
-4. The second commit will then only add `display()` — but it currently also writes `MAX_INPUT`. You'll need to handle the conflict or edit the second commit too.
-</details>
-
-<details>
-<summary>Hint 3 — Handling the second commit</summary>
-
-After amending the first commit to include `MAX_INPUT`, rebase will apply the second commit on top. Since `MAX_INPUT` is now already present, the second commit's version of the file will try to add it again — either causing a conflict or a duplicate.
-
-Mark the second commit as `edit` too (or resolve the conflict), then remove the `MAX_INPUT` line from that commit's diff before continuing.
-</details>
-
-<details>
-<summary>Hint 4 — Alternative: squash + re-split</summary>
-
-A simpler mental model: squash both commits into one, then split that one commit into two (like Challenge 0). This avoids reasoning about conflict resolution entirely.
-
-```bash
-git rebase -i main
-# mark both as "edit" or squash into one, then re-split
-```
-</details>
-
-## Key Commands
-
-```bash
-git rebase -i <base>          # interactive rebase
-git commit --amend --no-edit  # amend without changing message
-git add -p                    # stage changes hunk by hunk
-git rebase --continue         # proceed after an edit stop
-git push --force-with-lease   # force push safely
-```
 
 ## Expected End State
 

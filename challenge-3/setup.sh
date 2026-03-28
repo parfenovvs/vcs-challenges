@@ -16,66 +16,75 @@ git init --bare -b main "$REMOTE"
 git -C "$WORKSPACE" init -b main
 git -C "$WORKSPACE" remote add origin "$REMOTE"
 
-# Base commit on main
-printf '# Features\n' > "$WORKSPACE/features.txt"
-git -C "$WORKSPACE" add features.txt
+# Commit 1
+printf '# App module\n' > "$WORKSPACE/app.txt"
+git -C "$WORKSPACE" add app.txt
 git -C "$WORKSPACE" \
   -c user.name="Workshop" -c user.email="workshop@example.com" \
   commit -m "chore: initial project setup"
+
+# Commit 2
+printf 'user = User()\n' >> "$WORKSPACE/app.txt"
+git -C "$WORKSPACE" add app.txt
+git -C "$WORKSPACE" \
+  -c user.name="Workshop" -c user.email="workshop@example.com" \
+  commit -m "feat: add user model"
+
+# Commit 3
+printf 'auth = Auth(user)\n' >> "$WORKSPACE/app.txt"
+git -C "$WORKSPACE" add app.txt
+git -C "$WORKSPACE" \
+  -c user.name="Workshop" -c user.email="workshop@example.com" \
+  commit -m "feat: add authentication"
+
+# Push main (commits 1-3)
 git -C "$WORKSPACE" push -u origin main
 
-# feat/a: stacked on main
-git -C "$WORKSPACE" checkout -b feat/a
-printf 'feature_a()\n' >> "$WORKSPACE/features.txt"
-git -C "$WORKSPACE" add features.txt
-git -C "$WORKSPACE" \
-  -c user.name="Workshop" -c user.email="workshop@example.com" \
-  commit -m "feat: add feature_a"
-git -C "$WORKSPACE" push -u origin feat/a
+# Branch release/1.0 from commit 3
+git -C "$WORKSPACE" checkout -b release/1.0
+git -C "$WORKSPACE" push -u origin release/1.0
 
-# feat/b: stacked on feat/a
-git -C "$WORKSPACE" checkout -b feat/b
-printf 'feature_b()\n' >> "$WORKSPACE/features.txt"
-git -C "$WORKSPACE" add features.txt
-git -C "$WORKSPACE" \
-  -c user.name="Workshop" -c user.email="workshop@example.com" \
-  commit -m "feat: add feature_b"
-git -C "$WORKSPACE" push -u origin feat/b
-
-# feat/c: stacked on feat/b
-git -C "$WORKSPACE" checkout -b feat/c
-printf 'feature_c()\n' >> "$WORKSPACE/features.txt"
-git -C "$WORKSPACE" add features.txt
-git -C "$WORKSPACE" \
-  -c user.name="Workshop" -c user.email="workshop@example.com" \
-  commit -m "feat: add feature_c"
-git -C "$WORKSPACE" push -u origin feat/c
-
-# Simulate squash-merge of feat/a into main
+# Back to main for commits 4 and 5
 git -C "$WORKSPACE" checkout main
-git -C "$WORKSPACE" merge --squash feat/a
+
+# Commit 4: the hotfix
+printf 'calculate(n - 1)  # fix off-by-one\n' >> "$WORKSPACE/app.txt"
+git -C "$WORKSPACE" add app.txt
 git -C "$WORKSPACE" \
   -c user.name="Workshop" -c user.email="workshop@example.com" \
-  commit -m "feat: add feature_a (#1)"
+  commit -m "fix: correct off-by-one in calculate()"
+
+# Commit 5: unrelated feature
+printf 'export(data)\n' >> "$WORKSPACE/app.txt"
+git -C "$WORKSPACE" add app.txt
+git -C "$WORKSPACE" \
+  -c user.name="Workshop" -c user.email="workshop@example.com" \
+  commit -m "feat: add export functionality"
+
 git -C "$WORKSPACE" push origin main
 
-# End on feat/b
-git -C "$WORKSPACE" checkout feat/b
+# Switch to release/1.0 and cherry-pick the WRONG commit (export feature)
+git -C "$WORKSPACE" checkout release/1.0
+WRONG_COMMIT=$(git -C "$WORKSPACE" log --oneline origin/main | grep "feat: add export functionality" | awk '{print $1}')
+git -C "$WORKSPACE" \
+  -c user.name="Workshop" -c user.email="workshop@example.com" \
+  cherry-pick "$WRONG_COMMIT"
 
 echo ""
 echo "============================================================"
-echo "  CHALLENGE 3 — The Stack Collapse"
+echo "  CHALLENGE 3 — The Wrong Cherry-Pick"
 echo "============================================================"
 echo ""
-echo "  You are on branch: feat/b"
-echo "  Stack: main <- feat/a <- feat/b <- feat/c"
+echo "  You are on branch: release/1.0"
+echo "  This branch was cut from main at commit 3."
 echo ""
-echo "  feat/a was squash-merged into main as:"
-echo "  'feat: add feature_a (#1)'"
+echo "  Someone already ran cherry-pick — but picked the WRONG"
+echo "  commit: 'feat: add export functionality' was applied"
+echo "  instead of the intended hotfix."
 echo ""
-echo "  Now feat/b and feat/c are based on the OLD feat/a"
-echo "  commit, not the new squash commit on main."
-echo "  They need to be rebased onto the updated main."
+echo "  Your task:"
+echo "    1. Undo the wrong cherry-pick"
+echo "    2. Apply the correct commit: 'fix: correct off-by-one'"
 echo ""
 echo "  See CHALLENGE.md for full instructions and hints."
 echo "============================================================"

@@ -1,130 +1,62 @@
-# Challenge 4 — The Stack Insertion
+# Challenge 4 — The Stack Collapse
+
+## Scenario
+
+You had a stack of three PRs in review. The first one (`feat/a`) just got merged — but the repo uses squash-merge, so the merge commit looks nothing like your original. Now `feat/b` and `feat/c` are dangling off an orphaned commit, and CI is failing. You need to rebase the rest of the stack onto the updated `main` without duplicating the already-merged work.
 
 ## Starting State
 
-- Branch: `feat/a`
-- Current stack:
+- Branch: `feat/b`
+- Stack before the squash-merge:
 
 ```
 main:   [initial]
-feat/a: [initial] <- feat: add feature_a       <-- you are here
+feat/a: [initial] <- feat: add feature_a
 feat/b: [initial] <- feat: add feature_a <- feat: add feature_b
+feat/c: [initial] <- feat: add feature_a <- feat: add feature_b <- feat: add feature_c
 ```
 
-`features.txt` at `feat/a` tip:
-```
-# Features
-feature_a()
-```
+- `feat/a` was squash-merged into `main` as a single commit:
+  ```
+  feat: add feature_a (#1)
+  ```
 
-`features.txt` at `feat/b` tip:
-```
-# Features
-feature_a()
-feature_b()
-```
+- Current state of `main`:
+  ```
+  feat: add feature_a (#1)    <-- HEAD of main (squash commit)
+  chore: initial project setup
+  ```
+
+- `feat/b` and `feat/c` still point to the **old** `feat/a` commit, which no longer exists in `main`'s ancestry.
 
 ## Goal
 
-Insert a new branch `feat/new` between `feat/a` and `feat/b`, adding a new line `feature_new()` to `features.txt`.
+Rebase `feat/b` onto the updated `main`, dropping the now-redundant `feat/a` commit that was already merged. Then do the same for `feat/c` (rebased onto the updated `feat/b`).
 
-Target stack:
-```
-main <- feat/a <- feat/new <- feat/b
-```
-
-After insertion:
-- `feat/new` is 1 commit ahead of `feat/a`, adds `feature_new()`
-- `feat/b` is rebased so it sits on top of `feat/new` (1 commit ahead, adds `feature_b()`)
+After the challenge:
+- `feat/b` should be 1 commit ahead of `main` (only `feat: add feature_b`)
+- `feat/c` should be 1 commit ahead of `feat/b` (only `feat: add feature_c`)
 
 ## Why This Matters
 
-Mid-stack insertions are common: a reviewer asks for a prerequisite change, or you realise feature_b depends on a helper you forgot. Without tooling, this requires creating a branch, then carefully rebasing everything above it. This is a friction point that `jj` handles elegantly (operations are symmetric in jj — inserting is as easy as appending).
-
-## Hints
-
-<details>
-<summary>Hint 1 — Create feat/new from feat/a</summary>
-
-You're already on `feat/a`. Create the new branch:
-
-```bash
-git checkout -b feat/new
-# Edit features.txt to add feature_new()
-git add features.txt
-git commit -m "feat: add feature_new"
-git push -u origin feat/new
-```
-</details>
-
-<details>
-<summary>Hint 2 — Rebase feat/b onto feat/new</summary>
-
-`feat/b` currently has `feat/a`'s commit as its parent. You want to replay only the `feat/b`-specific commit (`feat: add feature_b`) on top of `feat/new`:
-
-```bash
-git rebase --onto feat/new feat/a feat/b
-```
-
-This says: "take the commits between `feat/a` and `feat/b` (exclusive), and put them on top of `feat/new`."
-</details>
-
-<details>
-<summary>Hint 3 — Resolving potential conflicts</summary>
-
-After the rebase, `feat/b` adds `feature_b()` on top of a file that now contains `feature_a()` and `feature_new()`. Git will try to apply the diff cleanly. If there's a conflict (e.g., line ordering), resolve it manually:
-
-```bash
-# Edit features.txt to have the correct order, then:
-git add features.txt
-git rebase --continue
-```
-</details>
-
-<details>
-<summary>Hint 4 — Verifying the result</summary>
-
-```bash
-git log --oneline --graph feat/b
-```
-
-You should see:
-```
-* feat: add feature_b       <-- feat/b
-* feat: add feature_new     <-- feat/new
-* feat: add feature_a       <-- feat/a
-* chore: initial project setup
-```
-</details>
-
-## Key Commands
-
-```bash
-git checkout -b <branch>              # create and switch to new branch
-git rebase --onto <newbase> <upstream> <branch>
-git rebase --continue                 # after resolving conflicts
-git log --oneline --graph --all       # visualize branch graph
-git push --force-with-lease           # push rewritten branches
-```
+This is the everyday cost of stacked PRs with squash-merge. Every time a PR at the base of your stack merges, you must rebase the rest of the stack using careful `--onto` rebasing.
 
 ## Expected End State
 
 ```
-git log --oneline main..feat/new
-# <hash> feat: add feature_new
-
 git log --oneline main..feat/b
 # <hash> feat: add feature_b
-# <hash> feat: add feature_new
-# <hash> feat: add feature_a
+
+git log --oneline main..feat/c
+# <hash> feat: add feature_c
+# <hash> feat: add feature_b
 ```
 
 ```
 # features.txt at feat/b tip:
 # Features
 feature_a()
-feature_new()
 feature_b()
 ```
 
-All three branches (`feat/a`, `feat/new`, `feat/b`) pushed to remote.
+Both `feat/b` and `feat/c` pushed with `--force-with-lease`.
